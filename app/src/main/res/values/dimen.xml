@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="pd_sm">5dp</dimen>
+    <dimen name="pd_nor">8dp</dimen>
+    <dimen name="pd_md">10dp</dimen>
+    <dimen name="pd_lg">15dp</dimen>
+    <dimen name="pd_xl">25dp</dimen>
+</resources>
