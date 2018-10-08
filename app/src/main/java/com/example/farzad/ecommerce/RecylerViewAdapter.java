@@ -6,8 +6,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.farzad.ecommerce.model.Product;
 import com.squareup.picasso.Picasso;
@@ -33,11 +35,17 @@ public class RecylerViewAdapter extends RecyclerView.Adapter<RecylerViewAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        Product product=mData.get(position);
+        final Product product=mData.get(position);
 
         viewHolder.setName(product.getName());
         viewHolder.setAddress(product.getAddress());
         viewHolder.setImageView(product.getImageUri());
+        viewHolder.btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(mActivity,"btn Clicked "+Integer.toString(product.getId()),Toast.LENGTH_LONG).show();
+            }
+        });
 
 
     }
@@ -53,12 +61,14 @@ public class RecylerViewAdapter extends RecyclerView.Adapter<RecylerViewAdapter.
     public class ViewHolder extends RecyclerView.ViewHolder{
         ImageView imageView;
         TextView title,description;
+        Button btn;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView=(ImageView) itemView.findViewById(R.id.image);
             title=(TextView) itemView.findViewById(R.id.title);
             description=(TextView) itemView.findViewById(R.id.description);
+            btn=(Button)itemView.findViewById(R.id.btn);
         }
         public void setName(String title){
             this.title.setText(title);
@@ -68,7 +78,6 @@ public class RecylerViewAdapter extends RecyclerView.Adapter<RecylerViewAdapter.
         }
         public void setImageView(String url){
 
-//            this.imageView.
             Picasso.get().load("http://i.imgur.com/DvpvklR.png").into(imageView);
 
         }

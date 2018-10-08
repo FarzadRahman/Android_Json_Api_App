@@ -70,7 +70,7 @@ public class HomeActivity extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
             HttpURLConnection urlConnection=null;
             BufferedReader reader=null;
-            Uri buildUri=Uri.parse("https://jsonplaceholder.typicode.com/posts");
+            Uri buildUri=Uri.parse("https://jsonplaceholder.typicode.com/comments");
 
             try
             {
@@ -126,16 +126,15 @@ public class HomeActivity extends AppCompatActivity {
             //parse JSON data
             try {
                 JSONArray jArray = new JSONArray(result);
-                Log.v("Response",jArray.toString());
+//                Log.v("Response",jArray.toString());
                 for(int i=0; i < jArray.length(); i++) {
 
                     JSONObject jObject = jArray.getJSONObject(i);
 
-                    String title = jObject.getString("title");
-                    String body = jObject.getString("body");
-                    int userId = jObject.getInt("userId");
-
-                    Product product=new Product(title,body,"image");
+                    String title = jObject.getString("name");
+                    String body = jObject.getString("email");
+                    int userId = jObject.getInt("id");
+                    Product product=new Product(title,body,"image",userId);
                     mArrayCollection.add(product);
 
                 } // End Loop
