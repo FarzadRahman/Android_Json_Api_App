@@ -1,6 +1,8 @@
 package com.example.farzad.ecommerce;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,24 +13,29 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.farzad.ecommerce.home.HomeActivity;
 import com.example.farzad.ecommerce.model.Product;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+
 public class RecylerViewAdapter extends RecyclerView.Adapter<RecylerViewAdapter.ViewHolder>{
     private static final String TAG="RecylerViewAdapter";
     private ArrayList<Product> mData;
     private Activity mActivity;
+    private Context context;
 
     public RecylerViewAdapter(ArrayList<Product> data,Activity activity){
         mData=data;
         this.mActivity=activity;
+
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        context = parent.getContext();
         View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.row_product,parent,false);
         return new ViewHolder(view);
     }
@@ -43,7 +50,11 @@ public class RecylerViewAdapter extends RecyclerView.Adapter<RecylerViewAdapter.
         viewHolder.btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(mActivity,"btn Clicked "+Integer.toString(product.getId()),Toast.LENGTH_LONG).show();
+//                Toast.makeText(mActivity,"btn Clicked "+Integer.toString(product.getId()),Toast.LENGTH_LONG).show();
+                Intent intent;
+                intent=new Intent(context,SingleProduct.class);
+                intent.putExtra("id", product.getId());
+                context.startActivity(intent);
             }
         });
 

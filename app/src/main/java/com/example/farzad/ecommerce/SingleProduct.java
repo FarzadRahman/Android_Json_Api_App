@@ -1,20 +1,20 @@
-package com.example.farzad.ecommerce.home;
+package com.example.farzad.ecommerce;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.example.farzad.ecommerce.R;
-import com.example.farzad.ecommerce.RecylerViewAdapter;
+import com.example.farzad.ecommerce.home.HomeActivity;
 import com.example.farzad.ecommerce.model.Product;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,35 +26,52 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 
-public class HomeActivity extends AppCompatActivity {
-    private RecyclerView mRecyclerView;
-    private RecylerViewAdapter mViewAdapter;
-    private ArrayList<Product> mArrayCollection;
-    @Override
+public class SingleProduct extends AppCompatActivity {
+    Product product;
+    TextView titleView,description;
+    ImageView image;
+    int id;
+    JSONObject jsonObj;
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-        init();
-        new FetchDataTask().execute();
+        setContentView(R.layout.activity_single);
+        Intent intent = getIntent();
+
+        this.id = intent.getIntExtra("id", 0);
+//        Log.v("Response",String.valueOf(id));
+        new SingleProduct.FetchDataTask().execute();
 
     }
 
-    public void init(){
-        mRecyclerView=(RecyclerView)findViewById(R.id.product_recycler);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setHasFixedSize(true);
-        mArrayCollection=new ArrayList<>();
-        mViewAdapter=new RecylerViewAdapter(mArrayCollection,this);
-        mRecyclerView.setAdapter(mViewAdapter);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        titleView=(TextView)findViewById(R.id.title);
+        description=(TextView)findViewById(R.id.description);
+        image=(ImageView) findViewById(R.id.image);
+
 
 
     }
 
-    public class FetchDataTask extends AsyncTask<Void,Void,Void>{
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    public void show(String title,String des,String imageUrl,int userId){
+        product=new Product(title,des,"image",userId);
+        titleView.setText(product.getName());
+        description.setText(product.getAddress());
+        Picasso.get().load("http://i.imgur.com/DvpvklR.png").into(image);
+
+    }
+
+
+    public class FetchDataTask extends AsyncTask<Void,Void,Void> {
         private String mZomatoString;
-        private ProgressDialog progressDialog = new ProgressDialog(HomeActivity.this);
+        private ProgressDialog progressDialog = new ProgressDialog(SingleProduct.this);
         InputStream inputStream = null;
         String result = "";
 
@@ -63,7 +80,7 @@ public class HomeActivity extends AppCompatActivity {
             progressDialog.show();
             progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                 public void onCancel(DialogInterface arg0) {
-                    FetchDataTask.this.cancel(true);
+                    SingleProduct.FetchDataTask.this.cancel(true);
                 }
             });
         }
@@ -71,7 +88,7 @@ public class HomeActivity extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
             HttpURLConnection urlConnection=null;
             BufferedReader reader=null;
-            Uri buildUri=Uri.parse("https://jsonplaceholder.typicode.com/comments");
+            Uri buildUri=Uri.parse("https://jsonplaceholder.typicode.com/comments/"+id);
 
             try
             {
@@ -98,7 +115,7 @@ public class HomeActivity extends AppCompatActivity {
                     return null;
                 }
                 result=buffer.toString();
-//                JSONObject jsonObject=new JSONObject(buffer.toString());
+                JSONObject jsonObject=new JSONObject(buffer.toString());
 //
 //                Log.v("Response",jsonObject.toString());
             }
@@ -124,28 +141,21 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         protected void onPostExecute(Void v) {
-            //parse JSON data
             try {
-                JSONArray jArray = new JSONArray(result);
-//                Log.v("Response",jArray.toString());
-                for(int i=0; i < jArray.length(); i++) {
+                JSONObject jsonObject=new JSONObject(result);
+                String title = jsonObject.getString("name");
+                String body = jsonObject.getString("body");
+                int userId = jsonObject.getInt("id");
+                show(title,body,"image",userId);
 
-                    JSONObject jObject = jArray.getJSONObject(i);
-
-                    String title = jObject.getString("name");
-                    String body = jObject.getString("email");
-                    int userId = jObject.getInt("id");
-                    Product product=new Product(title,body,"image",userId);
-                    mArrayCollection.add(product);
-
-                } // End Loop
-                mViewAdapter.notifyDataSetChanged();
-                this.progressDialog.dismiss();
             } catch (JSONException e) {
-                Log.e("JSONException", "Error: " + e.toString());
-            } // catch (JSONException e)
+                e.printStackTrace();
+            }
+
+            this.progressDialog.dismiss();
 
         } // protected void onPostExecute(Void v)
     } //class MyAsyncTask extends AsyncTask<String, String, Void>
+
 
 }
